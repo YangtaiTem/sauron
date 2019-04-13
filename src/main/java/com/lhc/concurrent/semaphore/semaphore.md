@@ -244,3 +244,26 @@ public class AcquireThread extends Thread{
 线程9:执行结束,时间:2019-04-13 11:10:31.942
 线程6:执行结束,时间:2019-04-13 11:10:33.941
 线程7:执行结束,时间:2019-04-13 11:10:33.942
+
+
+
+21.一些其他方法
+
+>availablePermits()方法，表示返回Semaphore对象中的当前可用许可数，此方法通常用于调试，因为许可数量（通路）可能是实时在改变的。
+drainPermits()方法可获取并返回立即可用的所有许可（通路）个数，并将可用许可置为0。
+
+
+>getQueueLength()获取等待许可的线程个数。
+hasQueuedThreads()判断有没有线程在等待这个许可。
+getQueueLength()和hasQueuedThreads()通常都是在判断当前有没有等待许可的线程信息时使用
+
+22.公平与非公平信号量
+    
+    有些时候，获取许可的顺序与线程启动的顺序有关，这时信号量就要分为公平与非公平的。
+    公平信号量是获得所得顺序和线程启动顺序有关，但仅仅是在概率上，不代表 100%能获取。
+    信号量默认的构造方法是创建非公平信号量(Semaphore semaphore = new Semaphore(8);)。
+    创建公平信号量的方式是:
+        Semaphore semaphore = new Semaphore(8, true);
+        
+23.tryAcquire()的使用
+    
