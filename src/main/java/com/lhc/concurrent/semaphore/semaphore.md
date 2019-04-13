@@ -266,4 +266,143 @@ getQueueLength()和hasQueuedThreads()通常都是在判断当前有没有等待�
         Semaphore semaphore = new Semaphore(8, true);
         
 23.tryAcquire()的使用
-    
+
+参数使用
+
+    当前时刻
+        
+        tryAcquire(int permits)
+        Acquires the given number of permits from this semaphore, only if all are available at the time of invocation.
+        尝试去从这个信号量获取指定数量的在调用时都是可用的许可 。
+        如果不使用permits 参数，tryAcquire()表示获取一个许可。
+
+    指定时间
+        
+        tryAcquire(int permits, long timeout, TimeUnit unit)
+        Acquires the given number of permits from this semaphore,
+        if all become available within the given waiting time and the current thread has not been interrupted.
+        在指定的时间内尝试去从这个信号量获取指定数量的许可 ，同时这段时间内，这个线程没有被中断。
+        如果不使用permits 参数，tryAcquire(long timeout, TimeUnit unit)表示获取一个许可。  
+   
+代码 
+
+```
+
+package com.lhc.concurrent.semaphore;
+
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+
+public class TryAcquireService {
+    private Semaphore semaphore = new Semaphore(8);
+
+    public void doSomething() {
+        try {
+            /**
+             * tryAcquire(int permits)
+             * Acquires the given number of permits from this semaphore, only if all are available at the time of invocation.
+             * 尝试去从这个信号量获取指定数量的在调用时都是可用的许可 。
+             * 如果不使用permits 参数，tryAcquire()表示获取一个许可。
+             */
+            if (semaphore.tryAcquire(2)) {
+                System.out.println(Thread.currentThread().getName() + "获得锁,时间:" + System.currentTimeMillis());
+                Thread.sleep(100);
+                semaphore.release(2);
+            }else {
+                System.out.println(Thread.currentThread().getName() + "没有获得锁,时间:" + System.currentTimeMillis());
+            }
+        }catch (InterruptedException e){
+            e.printStackTrace();
+        }
+    }
+
+    public void doThing() {
+        try {
+            /**
+             * tryAcquire(int permits, long timeout, TimeUnit unit)
+             * Acquires the given number of permits from this semaphore,
+             * if all become available within the given waiting time and the current thread has not been interrupted.
+             * 在指定的时间内尝试去从这个信号量获取指定数量的许可 ，同时这段时间内，这个线程没有被中断。
+             * 如果不使用permits 参数，tryAcquire(long timeout, TimeUnit unit)表示获取一个许可。
+             */
+            if (semaphore.tryAcquire(2, 1, TimeUnit.SECONDS)) {
+                System.out.println(Thread.currentThread().getName() + "获得锁,时间:" + System.currentTimeMillis());
+                Thread.sleep(1000);
+                System.out.println(Thread.currentThread().getName() + "释放锁,时间:" + System.currentTimeMillis());
+                semaphore.release(2);
+            }else {
+                System.out.println(Thread.currentThread().getName() + "没有获得锁,时间:" + System.currentTimeMillis());
+            }
+        }catch (InterruptedException e){
+            e.printStackTrace();
+        }
+    }
+}
+
+```
+
+测试类
+
+```
+
+package com.lhc.concurrent.semaphore;
+
+public class TryAcquireThread extends Thread{
+    private TryAcquireService tryAcquireService;
+
+    public TryAcquireThread(TryAcquireService tryAcquireService, String name) {
+        super();
+        this.tryAcquireService = tryAcquireService;
+        this.setName(name);
+    }
+
+    public static void main(String[] args){
+        TryAcquireService tryAcquireService = new TryAcquireService();
+        for (int i = 0; i < 10; i++) {
+            TryAcquireThread tryAcquireThread = new TryAcquireThread(tryAcquireService, "线程" + i);
+            tryAcquireThread.start();
+        }
+    }
+
+    @Override
+    public void run() {
+        //tryAcquireService.doSomething();
+        tryAcquireService.doThing();
+    }
+}
+
+
+```
+
+测试结果
+
+获取当前时刻
+> 线程0获得锁,时间:1555145916044
+线程4没有获得锁,时间:1555145916044
+线程2获得锁,时间:1555145916044
+线程1获得锁,时间:1555145916044
+线程6没有获得锁,时间:1555145916044
+线程5没有获得锁,时间:1555145916044
+线程3获得锁,时间:1555145916044
+线程7没有获得锁,时间:1555145916044
+线程8没有获得锁,时间:1555145916044
+线程9没有获得锁,时间:1555145916044
+
+获取指定时间内
+
+>线程9获得锁,时间:1555146046722
+线程7获得锁,时间:1555146046722
+线程1获得锁,时间:1555146046722
+线程6获得锁,时间:1555146046722
+线程6释放锁,时间:1555146047722
+线程9释放锁,时间:1555146047722
+线程5获得锁,时间:1555146047722
+线程4获得锁,时间:1555146047722
+线程3没有获得锁,时间:1555146047722
+线程1释放锁,时间:1555146047722
+线程7释放锁,时间:1555146047722
+线程0没有获得锁,时间:1555146047722
+线程8没有获得锁,时间:1555146047722
+线程2没有获得锁,时间:1555146047722
+线程5释放锁,时间:1555146048723
+线程4释放锁,时间:1555146048723
