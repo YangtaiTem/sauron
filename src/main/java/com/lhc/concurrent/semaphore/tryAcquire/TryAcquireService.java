@@ -1,4 +1,4 @@
-package com.lhc.concurrent.semaphore;
+package com.lhc.concurrent.semaphore.tryAcquire;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;

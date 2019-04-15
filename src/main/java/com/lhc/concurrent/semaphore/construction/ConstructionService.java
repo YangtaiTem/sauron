@@ -1,4 +1,4 @@
-package com.lhc.concurrent.semaphore;
+package com.lhc.concurrent.semaphore.construction;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

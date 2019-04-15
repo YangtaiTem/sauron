@@ -1,4 +1,4 @@
-package com.lhc.concurrent.semaphore;
+package com.lhc.concurrent.semaphore.tryAcquire;
 
 public class TryAcquireThread extends Thread{
     private TryAcquireService tryAcquireService;

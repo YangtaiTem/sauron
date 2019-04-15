@@ -1,4 +1,4 @@
-package com.lhc.concurrent.semaphore;
+package com.lhc.concurrent.semaphore.construction;
 
 public class ConstructionThread extends Thread{
     private ConstructionService constructionService;
