@@ -8,6 +8,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class StringPoolService {
     private int poolMaxSize = 3;
+    //同事可以有5个线程访问这个pool
     private int semaphorePermits = 5;
 
     private Semaphore semaphore = new Semaphore(semaphorePermits);
@@ -18,6 +19,7 @@ public class StringPoolService {
 
     public StringPoolService() {
         super();
+        //初始化一个list
         for (int i = 0; i < poolMaxSize; i++){
             list.add("String " + i);
         }
