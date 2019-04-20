@@ -8,7 +8,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class StringPoolService {
     private int poolMaxSize = 3;
-    //同事可以有5个线程访问这个pool
+    //同时可以有5个线程访问这个pool
     private int semaphorePermits = 5;
 
     private Semaphore semaphore = new Semaphore(semaphorePermits);
@@ -29,11 +29,14 @@ public class StringPoolService {
         String getString = null;
         try {
             semaphore.acquire();
+            //加锁，能保证这段代码同一时刻只有一个线程在运行
             lock.lock();
             while (list.size() == 0){
+                //如果pool为空，等待
                 condition.await();
             }
             getString = list.remove(0);
+            //解锁
             lock.unlock();
         }catch (InterruptedException e){
             e.printStackTrace();
@@ -42,9 +45,12 @@ public class StringPoolService {
     }
 
     public void put(String str){
+        //加锁
         lock.lock();
         list.add(str);
+        //填充以后通知，get方法就不再await
         condition.signalAll();
+        //解锁
         lock.unlock();
         semaphore.release();
     }

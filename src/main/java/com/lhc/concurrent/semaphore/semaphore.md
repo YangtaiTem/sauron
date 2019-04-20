@@ -406,3 +406,391 @@ public class TryAcquireThread extends Thread{
 线程2没有获得锁,时间:1555146047722
 线程5释放锁,时间:1555146048723
 线程4释放锁,时间:1555146048723
+
+
+31.字符串池
+>   类SemaPhore可以有效地对并发执行任务的线程数量进行限制，可以用在pool池技术中，
+可以设置同时访问pool池中数据的线程数量。
+    目的:实现同时有若干个线程可以访问池中的数据，但同时只有一个线程可以取得数据，使用后再放回。
+    
+代码:
+
+```
+
+package com.lhc.concurrent.semaphore.StringPool;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class StringPoolService {
+    private int poolMaxSize = 3;
+    //同时可以有5个线程访问这个pool
+    private int semaphorePermits = 5;
+
+    private Semaphore semaphore = new Semaphore(semaphorePermits);
+    private ReentrantLock lock = new ReentrantLock();
+    private Condition condition = lock.newCondition();
+
+    private List<String> list = new ArrayList<>();
+
+    public StringPoolService() {
+        super();
+        //初始化一个list
+        for (int i = 0; i < poolMaxSize; i++){
+            list.add("String " + i);
+        }
+    }
+
+    public String get(){
+        String getString = null;
+        try {
+            semaphore.acquire();
+            //加锁，能保证这段代码同一时刻只有一个线程在运行
+            lock.lock();
+            while (list.size() == 0){
+                //如果pool为空，等待
+                condition.await();
+            }
+            getString = list.remove(0);
+            //解锁
+            lock.unlock();
+        }catch (InterruptedException e){
+            e.printStackTrace();
+        }
+        return getString;
+    }
+
+    public void put(String str){
+        //加锁
+        lock.lock();
+        list.add(str);
+        //填充以后通知，get方法就不再await
+        condition.signalAll();
+        //解锁
+        lock.unlock();
+        semaphore.release();
+    }
+}
+
+```
+
+测试类
+
+```
+
+/**
+ * 类Semaphore 可以有效地对并发执行任务的线程数量进行限制
+ * 创建一个字符串池，，同时有若干个线程可以访问池中的数据，但同时只有一个线程可以取得数据，使用完毕再放回
+ */
+package com.lhc.concurrent.semaphore.StringPool;
+
+public class StringPoolThread extends Thread {
+    private StringPoolService stringPoolService;
+
+    public StringPoolThread(StringPoolService stringPoolService) {
+        super();
+        this.stringPoolService = stringPoolService;
+    }
+
+    @Override
+    public void run() {
+        for (int i = 0; i < 64; i++) {
+            //取了再放进去
+            String s = stringPoolService.get();
+            System.out.println(Thread.currentThread().getName() + " 取得值 " + s);
+            stringPoolService.put(s);
+        }
+    }
+
+    public static void main(String[] args) {
+        StringPoolService stringPoolService = new StringPoolService();
+        StringPoolThread[] stringPoolThreads = new StringPoolThread[10];
+        for (int i = 0; i < stringPoolThreads.length; i++) {
+            stringPoolThreads[i] = new StringPoolThread(stringPoolService);
+        }
+        for (int i = 0; i < stringPoolThreads.length; i++) {
+            stringPoolThreads[i].start();
+        }
+    }
+}
+
+
+```
+
+测试结果
+
+> Thread-1 取得值 String 1
+  Thread-0 取得值 String 0
+  Thread-2 取得值 String 2
+  Thread-7 取得值 String 1
+  Thread-2 取得值 String 0
+  Thread-1 取得值 String 1
+  Thread-7 取得值 String 2
+  Thread-3 取得值 String 0
+  Thread-1 取得值 String 1
+  Thread-3 取得值 String 2
+  Thread-2 取得值 String 0
+  Thread-7 取得值 String 2
+  Thread-1 取得值 String 1
+  Thread-7 取得值 String 2
+  Thread-2 取得值 String 0
+  Thread-7 取得值 String 2
+  Thread-1 取得值 String 1
+  Thread-3 取得值 String 2
+  Thread-2 取得值 String 0
+  Thread-3 取得值 String 2
+  Thread-5 取得值 String 1
+  Thread-4 取得值 String 2
+  Thread-3 取得值 String 0
+  Thread-4 取得值 String 2
+  Thread-5 取得值 String 1
+  Thread-4 取得值 String 2
+  Thread-8 取得值 String 0
+  Thread-4 取得值 String 2
+  Thread-6 取得值 String 1
+  Thread-0 取得值 String 2
+  Thread-8 取得值 String 0
+  Thread-0 取得值 String 2
+  Thread-6 取得值 String 1
+  Thread-0 取得值 String 2
+  Thread-8 取得值 String 0
+  Thread-0 取得值 String 2
+  Thread-6 取得值 String 1
+  Thread-4 取得值 String 2
+  Thread-8 取得值 String 0
+  Thread-9 取得值 String 2
+  Thread-6 取得值 String 1
+  Thread-9 取得值 String 2
+  Thread-8 取得值 String 0
+  Thread-9 取得值 String 2
+  Thread-6 取得值 String 1
+  Thread-9 取得值 String 2
+  Thread-5 取得值 String 0
+  Thread-9 取得值 String 1
+  Thread-5 取得值 String 2
+  Thread-5 取得值 String 0
+  
+  
+32.多生产者/消费者
+
+> 多个生产者和消费者，同时限制生产者和消费者的数量
+类Semaphore提供了限制并发线程数的功能，此功能在默认的synchronized中是不提供的。
+
+代码
+
+```
+
+/**
+ * 实现生产者消费者模式
+ * 限制生产者与消费者的数量
+ */
+package com.lhc.concurrent.semaphore.repast;
+
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class RepastService {
+    /**
+     * 初始化生产者和消费者两个信号量
+     */
+    volatile private Semaphore cook = new Semaphore(10);
+    volatile private Semaphore diner = new Semaphore(5);
+    /**
+     * 初始化两个Condition
+     */
+    volatile private ReentrantLock lock = new ReentrantLock();
+    volatile private Condition setCondition = lock.newCondition();
+    volatile private Condition getCondition = lock.newCondition();
+    /**
+     * 初始化一个容器
+     */
+    volatile private Object[] producePosition = new Object[4];
+
+    /**
+     * 判断容器是否为空
+     * @return
+     */
+    public boolean isEmpty() {
+        for (int i = 0; i < producePosition.length; i++) {
+            if (producePosition[i] != null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 判断容器是否已满
+     * @return
+     */
+    public boolean isFull() {
+        for (int i = 0; i < producePosition.length; i++) {
+            if (producePosition[i] == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 在容器填一次数据
+     * 当容器已满，就等待
+     * 等到被通知再继续填充
+     * 填充一次以后，通知未空
+     */
+    public void set() {
+        try {
+            cook.acquire();
+            lock.lock();
+            while (isFull()) {
+                setCondition.await();
+            }
+            for (int i = 0; i < producePosition.length; i++) {
+                if (producePosition[i] == null) {
+                    producePosition[i] = "food";
+                    System.out.println(Thread.currentThread().getName() + " cook " + producePosition[i] + i);
+                    break;
+                }
+            }
+            getCondition.signalAll();
+            lock.unlock();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            cook.release();
+        }
+    }
+
+    /**
+     * 在容器取一次数据
+     * 当容器已空时，就等待
+     * 等到被通知再继续取
+     * 取一次以后，通知未满
+     */
+    public void get() {
+        try {
+            diner.acquire();
+            lock.lock();
+            while (isEmpty()) {
+                getCondition.await();
+            }
+            for (int i = 0; i < producePosition.length; i++) {
+                if (producePosition[i] != null) {
+                    System.out.println(Thread.currentThread().getName() + " eat food" + i);
+                    producePosition[i] = null;
+                    break;
+                }
+            }
+            setCondition.signalAll();
+            lock.unlock();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            diner.release();
+        }
+    }
+}
+
+
+```
+
+测试类
+
+```
+
+package com.lhc.concurrent.semaphore.repast;
+
+public class CookThread extends Thread {
+    private RepastService repastService;
+
+    public CookThread(RepastService repastService) {
+        this.repastService = repastService;
+    }
+
+    @Override
+    public void run() {
+        repastService.set();
+    }
+
+    public static void main(String[] args) throws InterruptedException{
+        RepastService repastService = new RepastService();
+        CookThread[] cookThreads = new CookThread[20];
+        EatThread[] eatThreads = new EatThread[20];
+
+        for (int i = 0; i < 20; i++){
+            cookThreads[i] = new CookThread(repastService);
+            eatThreads[i] = new EatThread(repastService);
+        }
+        Thread.sleep(2000);
+        for (int i = 0; i < 20; i++){
+            cookThreads[i].start();
+            eatThreads[i].start();
+        }
+    }
+}
+
+
+package com.lhc.concurrent.semaphore.repast;
+
+public class EatThread extends Thread {
+    private RepastService repastService;
+
+    public EatThread(RepastService repastService) {
+        this.repastService = repastService;
+    }
+
+    @Override
+    public void run() {
+        repastService.get();
+    }
+}
+
+
+```
+
+测试结果
+
+> Thread-0 cook food0
+  Thread-11 eat food0
+  Thread-8 cook food0
+  Thread-4 cook food1
+  Thread-2 cook food2
+  Thread-3 eat food0
+  Thread-16 cook food0
+  Thread-18 cook food3
+  Thread-5 eat food0
+  Thread-26 cook food0
+  Thread-1 eat food0
+  Thread-28 cook food0
+  Thread-15 eat food0
+  Thread-6 cook food0
+  Thread-9 eat food0
+  Thread-19 eat food1
+  Thread-7 eat food2
+  Thread-38 cook food0
+  Thread-12 cook food1
+  Thread-14 cook food2
+  Thread-13 eat food0
+  Thread-29 eat food1
+  Thread-30 cook food0
+  Thread-24 cook food1
+  Thread-17 eat food0
+  Thread-25 eat food1
+  Thread-36 cook food0
+  Thread-21 eat food0
+  Thread-23 eat food2
+  Thread-37 eat food3
+  Thread-20 cook food0
+  Thread-32 cook food1
+  Thread-22 cook food2
+  Thread-34 cook food3
+  Thread-31 eat food0
+  Thread-27 eat food1
+  Thread-10 cook food0
+  Thread-33 eat food0
+  Thread-35 eat food2
+  Thread-39 eat food3
