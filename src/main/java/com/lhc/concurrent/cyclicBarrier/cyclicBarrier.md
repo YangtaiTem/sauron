@@ -113,3 +113,105 @@ public class GameThread extends Thread {
   Thread3 1555921977629开始跑第2阶段 2   
   Thread3 1555921977629结束跑第2阶段 0   
   Thread0 1555921977629结束跑第2阶段 0   
+  
+4.getNumberWaiting() 和 getParties()
+> getNumberWaiting() 获取到达屏障点的线程   
+getParties() 取得parties个数
+
+代码
+
+```
+
+package com.lhc.concurrent.cyclicBarrier;
+
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+public class PartyService {
+    public CyclicBarrier cyclicBarrier = new CyclicBarrier(3, new Runnable() {
+        @Override
+        public void run() {
+            System.out.println("彻底结束   " + System.currentTimeMillis());
+        }
+    });
+
+    public void doService() {
+        try {
+            System.out.println(Thread.currentThread().getName() + "准备");
+            if ("1".equals(Thread.currentThread().getName())) {
+                Thread.sleep(Integer.MAX_VALUE);
+            }
+            //等待指定时间，如果超时就抛出异常
+            cyclicBarrier.await(4, TimeUnit.SECONDS);
+            System.out.println(Thread.currentThread().getName() + "结束");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (BrokenBarrierException e) {
+            e.printStackTrace();
+        }catch (TimeoutException e){
+            e.printStackTrace();
+        }
+    }
+}
+
+```
+
+测试类
+
+```
+
+package com.lhc.concurrent.cyclicBarrier;
+
+public class PartyThread extends Thread {
+    private PartyService partyService;
+
+    public PartyThread(PartyService partyService) {
+        super();
+        this.partyService = partyService;
+    }
+
+    @Override
+    public void run() {
+        partyService.doService();
+    }
+
+    public static void main(String[] args) {
+        PartyService partyService = new PartyService();
+        PartyThread[] partyThreads = new PartyThread[3];
+        for (int i = 0; i < partyThreads.length; i++) {
+            partyThreads[i] = new PartyThread(partyService);
+            partyThreads[i].setName(i + "");
+            partyThreads[i].start();
+        }
+        try{
+            Thread.sleep(1000);
+        }catch (InterruptedException e){
+            e.printStackTrace();
+        }
+
+        System.out.println("使用数" + partyService.cyclicBarrier.getParties());
+        System.out.println("等待数" + partyService.cyclicBarrier.getNumberWaiting());
+    }
+}
+
+```
+
+打印结果
+
+> 0准备   
+  2准备   
+  1准备   
+  使用数3   
+  等待数2   
+  java.util.concurrent.BrokenBarrierException   
+    at java.util.concurrent.CyclicBarrier.dowait(CyclicBarrier.java:250)   
+  	at java.util.concurrent.CyclicBarrier.await(CyclicBarrier.java:435)   
+  	at com.lhc.concurrent.cyclicBarrier.PartyService.doService(PartyService.java:22)   
+  	at com.lhc.concurrent.cyclicBarrier.PartyThread.run(PartyThread.java:13)   
+  java.util.concurrent.TimeoutException   
+  	at java.util.concurrent.CyclicBarrier.dowait(CyclicBarrier.java:257)   
+  	at java.util.concurrent.CyclicBarrier.await(CyclicBarrier.java:435)   
+  	at com.lhc.concurrent.cyclicBarrier.PartyService.doService(PartyService.java:22)   
+  	at com.lhc.concurrent.cyclicBarrier.PartyThread.run(PartyThread.java:13)   

@@ -19,6 +19,7 @@ public class PartyService {
             if ("1".equals(Thread.currentThread().getName())) {
                 Thread.sleep(Integer.MAX_VALUE);
             }
+            //等待指定时间，如果超时就抛出异常
             cyclicBarrier.await(4, TimeUnit.SECONDS);
             System.out.println(Thread.currentThread().getName() + "结束");
         } catch (InterruptedException e) {
