@@ -13,7 +13,7 @@
      * @param keepAliveTime when the number of threads is greater than
      *        the core, this is the maximum time that excess idle threads
      *        will wait for new tasks before terminating.
-     *      空闲线程的回收时间
+     *      核心线程之外的空闲线程的回收时间
      * @param unit the time unit for the {@code keepAliveTime} argument
      *      上面时间的单位
      * @param workQueue the queue to use for holding tasks before they are
