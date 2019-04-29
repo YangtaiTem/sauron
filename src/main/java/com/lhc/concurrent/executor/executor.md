@@ -44,4 +44,6 @@
              threadFactory, handler);
     }
 
-```
+````
+
+shutdown() 和 shutdownNow()
