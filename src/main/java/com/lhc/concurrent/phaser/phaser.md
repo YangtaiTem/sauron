@@ -524,6 +524,62 @@ public class Test {
     方法forceTermination使Phaser对象的屏障功能失效
     方法isTerminated()判断Phaser对象是否已经呈销毁状态
     
+62.代码
+
+```
+
+package com.lhc.concurrent.phaser.force;
+
+
+import java.util.concurrent.Phaser;
+
+public class MyThread extends Thread{
+    private Phaser phaser;
+
+    public MyThread(Phaser phaser) {
+        super();
+        this.phaser = phaser;
+    }
+
+    @Override
+    public void run() {
+        System.out.println(Thread.currentThread().getName() + " begin " + System.currentTimeMillis());
+        phaser.arriveAndAwaitAdvance();
+        System.out.println(Thread.currentThread().getName() + " end " + System.currentTimeMillis());
+    }
+
+    public static void main(String[] args){
+        Phaser phaser = new Phaser(3);
+        MyThread myThread = new MyThread(phaser);
+        myThread.setName("myThread");
+        myThread.start();
+
+        MyThread myThread1 = new MyThread(phaser);
+        myThread1.setName("myThread1");
+        myThread1.start();
+
+        try{
+            Thread.sleep(1000);
+            //使屏障功能失效
+            phaser.forceTermination();
+            //判断是否销毁
+            System.out.println(phaser.isTerminated());
+        }catch (InterruptedException e){
+            e.printStackTrace();
+        }
+    }
+}
+
+```
+
+63.输出结果
+
+> myThread begin 1556540166856   
+  myThread1 begin 1556540166856   
+  true   
+  myThread1 end 1556540167863   
+  myThread end 1556540167863    
+    
 
 
     

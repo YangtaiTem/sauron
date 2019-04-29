@@ -30,7 +30,9 @@ public class MyThread extends Thread{
 
         try{
             Thread.sleep(1000);
+            //使屏障功能失效
             phaser.forceTermination();
+            //判断是否销毁
             System.out.println(phaser.isTerminated());
         }catch (InterruptedException e){
             e.printStackTrace();
