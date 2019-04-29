@@ -21,9 +21,6 @@ public class DerThread1 extends Thread{
         DerThread1 derThreadA = new DerThread1(phaser);
         derThreadA.setName("A");
         derThreadA.start();
-       /* DerThread1 derThreadB = new DerThread1(phaser);
-        derThreadB.setName("B");
-        derThreadB.start();*/
         DerThread2 derThreadC = new DerThread2(phaser);
         derThreadC.setName("C");
         derThreadC.start();
