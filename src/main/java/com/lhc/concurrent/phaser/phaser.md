@@ -96,8 +96,10 @@ public class PhaserTool {
             System.out.println(Thread.currentThread().getName() + " 1 begin = " + System.currentTimeMillis());
             Thread.sleep(2000);
             System.out.println(Thread.currentThread().getName() + " parties: " + phaser.getRegisteredParties());
+            //取消注册 parties -1
             phaser.arriveAndDeregister();
             System.out.println(Thread.currentThread().getName() + " 取消注册," + "parties: " + phaser.getRegisteredParties());
+            //取消注册 parties -1
             phaser.arriveAndDeregister();
             System.out.println(Thread.currentThread().getName() + " 取消注册," + "parties: " + phaser.getRegisteredParties());
             System.out.println(Thread.currentThread().getName() + " 1 end = " + System.currentTimeMillis());
