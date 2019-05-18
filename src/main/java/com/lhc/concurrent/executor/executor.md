@@ -119,7 +119,7 @@ public class Constructor {
 
 ```
 
-1.2 关于
+1.2 关于 corePoolSize + LinkedBlockingDeque.size
 
 ```
 
