@@ -332,3 +332,9 @@ public class MyThreadPool extends ThreadPoolExecutor{
 3、任务执行按照规定的调度规则执行。线程池通过队列形式来接收任务。再通过空闲线程来逐一取出进行任务调度。即线程池可以控制任务调度的执行顺序。
 4、可制定拒绝策略。即任务队列已满时，后来任务的拒绝处理规则。
 以上意义对于singleThreadExecutor来说也是适用的。普通线程和线程池中创建的线程其最大的区别就是有无一个管理者对线程进行管理。
+
+12.1 方法execute() 与submit的区别
+
+    1) 方法execute() 没有返回值，而submit()方法可以有返回值
+    2) 方法execute() 在默认的情况下异常直接抛出，不能捕获，但可以通过自定义ThreadFactory 的方式进行捕获，而submit()方法在默认的情况下，可以
+    捕获异常。
