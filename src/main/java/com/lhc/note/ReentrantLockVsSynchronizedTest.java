@@ -1,11 +1,13 @@
-package com.lhc.concurrent;
+package com.lhc.note;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.concurrent.locks.ReentrantLock;
 
-
+/**
+ *  在不同情况下ReentrantLock和SynchronizedT的效率
+ */
 public class ReentrantLockVsSynchronizedTest {
     public static AtomicInteger a = new AtomicInteger(0);
     public static LongAdder b = new LongAdder();
