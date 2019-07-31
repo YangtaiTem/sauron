@@ -16,6 +16,11 @@ import java.util.stream.Stream;
  **/
 
 public class StreamTest {
+    /**
+     * 对于元素的匹配
+     * allMatch 所有元素匹配
+     * anyMatch 任一元素匹配
+     */
     @Test
     public void match() {
         List list = getList();
@@ -23,6 +28,9 @@ public class StreamTest {
         System.out.println(list.stream().anyMatch(o -> (Long) o > 10));
     }
 
+    /**
+     * 循环处理
+     */
     @Test
     public void forEach() {
         List list = getList();
@@ -35,6 +43,9 @@ public class StreamTest {
         });
     }
 
+    /**
+     * 过滤
+     */
     @Test
     public void filter() {
         List<Long> list = getList();
@@ -42,6 +53,9 @@ public class StreamTest {
         collect.forEach(a -> System.out.println(a));
     }
 
+    /**
+     * 每一个元素做指定操作，返回指定类型
+     */
     @Test
     public void map() {
         List<Long> list = getList();
@@ -49,6 +63,9 @@ public class StreamTest {
         collect.forEach(a -> System.out.println(a));
     }
 
+    /**
+     * 排序，使用Long的compareTo
+     */
     @Test
     public void sorted() {
         List<Long> list = getList();
@@ -57,6 +74,9 @@ public class StreamTest {
         collectLong.forEach(a -> System.out.println(a));
     }
 
+    /**
+     * 排序，自定义排序方法
+     */
     @Test
     public void sortedDesc() {
         List<Long> list = getList();
@@ -65,6 +85,9 @@ public class StreamTest {
         collect.forEach(a -> System.out.println(a));
     }
 
+    /**
+     * 拼接字符串
+     */
     @Test
     public void joining() {
         List<Long> list = getList();
@@ -72,6 +95,9 @@ public class StreamTest {
         System.out.println(collect);
     }
 
+    /**
+     * 统计
+     */
     @Test
     public void stats() {
         List<Long> list = getList();
@@ -83,12 +109,18 @@ public class StreamTest {
         System.out.println(count);
     }
 
+    /**
+     * 规约
+     */
     @Test
     public void reduce() {
         Stream<String> s = Stream.of("test", "t1", "t2", "t3", "t4");
         System.out.println(s.reduce("[value]", (s1, s2) -> s1.concat(s2)));
     }
 
+    /**
+     * 并行，规约
+     */
     @Test
     public void parallelReduce() {
         /**
