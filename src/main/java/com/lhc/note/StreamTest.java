@@ -1,10 +1,9 @@
 package com.lhc.note;
 
-import com.google.common.collect.Lists;
 import org.junit.Test;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -36,9 +35,9 @@ public class StreamTest {
         List list = getList();
         Long a = 1L;
         list.stream().forEach(o -> {
-            if(0 < (Long)o){
-                  o = Long.valueOf((Long) o + a);
-                  System.out.println((Long) o);
+            if (0 < (Long) o) {
+                o = Long.valueOf((Long) o + a);
+                System.out.println((Long) o);
             }
         });
     }
@@ -49,7 +48,7 @@ public class StreamTest {
     @Test
     public void filter() {
         List<Long> list = getList();
-        List<Long> collect = list.stream().filter(o ->  o > 10).collect(Collectors.toList());
+        List<Long> collect = list.stream().filter(o -> o > 10).collect(Collectors.toList());
         collect.forEach(a -> System.out.println(a));
     }
 
