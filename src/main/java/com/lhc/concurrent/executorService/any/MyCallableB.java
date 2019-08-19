@@ -13,7 +13,7 @@ public class MyCallableB implements Callable<String> {
     @Override
     public String call() throws Exception {
         /*System.out.println(Thread.currentThread().getName() + " begin ");
-        for (int i = 0; i < 12345; i++) {
+        for (int i = 0; i < 321; i++) {
             System.out.println("MyCallableB 运行中:" + i);
         }
         System.out.println(Thread.currentThread().getName() + " end ");
@@ -26,16 +26,16 @@ public class MyCallableB implements Callable<String> {
                 System.out.println("MyCallableB 运行中:" + i);
             }
             if (true) {
-                System.out.println("中断了 ==============================================");
+                System.out.println(" ============================================== 中断了");
                 throw new NullPointerException();
             }
             System.out.println(Thread.currentThread().getName() + " end ");
         }catch (Exception e){
-            System.out.println(e.getMessage() + ":左边信息就是捕获的异常信息===========================================");
+            e.printStackTrace();
+            System.out.println(e.getMessage() + "===========================================:左边信息就是捕获的异常信息");
             throw e;
         }
-
-        return "return A";
+        return "MyCallableB";
     }
 
     public static void main(String[] args) {
