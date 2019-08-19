@@ -46,7 +46,7 @@ public class MyCallable implements Callable<String>{
         for (int i = 0; i < 5; i++){
             /**
              * 哪个任务先执行完，那个任务的返回值就先打印，解决了Future 阻塞的特点
-             * 但是如果没有任务被执行完，则.take().get()方法还是呈阻塞特性。
+             * 但是如果没有任何任务被执行完，则.take().get()方法还是呈阻塞特性。
              */
             System.out.println(completionService.take().get());
         }
