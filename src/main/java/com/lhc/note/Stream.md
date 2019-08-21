@@ -1,19 +1,29 @@
-package com.lhc.note;
+### Java8特性 Stream
 
-import org.junit.Test;
+1.1
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+    Java8中的Stream 对于集合的处理十分方便，使用起来也像德芙般丝滑~
+    一.对于元素的匹配
+         使用Predicate （断言，给一个参数T，返回boolean类型的结果）作为参数
+         allMatch 所有元素匹配
+         anyMatch 任一元素匹配
+    二.循环遍历，对每一个元素进行处理
+       使用了Consumer,重写了其中的accept(T t)方法
+    三.filter
+       使用Predicate （断言，给一个参数T，返回boolean类型的结果）作为参数
+       将集合中不符合条件的元素过滤
+    四.map
+       每一个元素做指定操作，返回指定类型
+       使用Function  重写了apply(T t)方法
+    五.sorted
+       使用Comparator，重写compare(T o1, T o2)方法进行排序
+       这里是使用Long的compareTo
+    六.统计，规约，字符串拼接
+    ···
+    
+1.2使用案例
 
-/**
- * @program: sauron
- * @description: 关于Java8 Stream
- * @author: hjt
- * @create: 2019-07-28 14:03
- **/
+```
 
 public class StreamTest {
     /**
@@ -44,7 +54,7 @@ public class StreamTest {
             }
         });
     }
-
+    
     /**
      * filter
      * 使用Predicate （断言，给一个参数T，返回boolean类型的结果）作为参数
@@ -68,7 +78,7 @@ public class StreamTest {
         List<Long> collect = list.stream().map(a -> a * a).collect(Collectors.toList());
         collect.forEach(a -> System.out.println(a));
     }
-
+    
     /**
      * sorted
      * 使用Comparator，重写compare(T o1, T o2)方法进行排序
@@ -98,7 +108,7 @@ public class StreamTest {
                 .collect(Collectors.toList());
         collect.forEach(a -> System.out.println(a));
     }
-
+    
     /**
      * 拼接字符串
      */
@@ -123,7 +133,7 @@ public class StreamTest {
         double count = list.stream().mapToLong(a -> a).summaryStatistics().getCount();
         System.out.println(count);
     }
-
+    
     /**
      * 规约
      */
@@ -147,7 +157,6 @@ public class StreamTest {
 
     }
 
-
     public List getList() {
         ArrayList<Long> arrayList = new ArrayList<>();
         arrayList.add(5L);
@@ -156,5 +165,6 @@ public class StreamTest {
         arrayList.add(46L);
         arrayList.add(99L);
         return arrayList;
-    }
-}
+    }        
+
+```
