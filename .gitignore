@@ -1,0 +1,13 @@
+/**/.DS_Store
+
+/**/pom.xml.versionsBackup
+
+/**/.project
+/**/.classpath
+/**/.settings
+/**/target/**/*
+
+/**/etc/cas/logs/*
+
+.idea
+*.iml
