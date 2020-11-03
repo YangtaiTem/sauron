@@ -3,8 +3,6 @@ package com.lhc.note;
 import org.junit.Test;
 
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * @program: sauron
@@ -15,7 +13,7 @@ import java.util.function.Function;
 
 public class OptionalTest {
     @Test
-    public void test(){
+    public void test() {
         User user = new User();
         user.setAge(10);
         user.setName("z");
@@ -23,7 +21,7 @@ public class OptionalTest {
 
     }
 
-    public static class User{
+    public static class User {
         private int age;
         private String name;
         private String password;
