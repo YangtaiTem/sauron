@@ -149,12 +149,21 @@ public class StreamTest {
 
 
     public List getList() {
-        ArrayList<Long> arrayList = new ArrayList<>();
-        arrayList.add(5L);
-        arrayList.add(3L);
-        arrayList.add(88L);
-        arrayList.add(46L);
-        arrayList.add(99L);
-        return arrayList;
+        List<Long> list = new ArrayList<>();
+        list.add(5L);
+        list.add(3L);
+        list.add(88L);
+        list.add(46L);
+        list.add(99L);
+        return list;
+    }
+
+    @Test
+    public void testMap(){
+        List<String> list = new ArrayList<>();
+        list.add("hello world");
+        list.add("hello ted");
+        List<String[]> collect = list.stream().map(s -> s.split(" ")).collect(Collectors.toList());
+
     }
 }
